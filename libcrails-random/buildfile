@@ -1,0 +1,30 @@
+import intf_libs += libboost-random%lib{boost_random}
+
+lib{crails-random}: {hxx ixx txx cxx}{**} $impl_libs $intf_libs
+
+hxx{export}@./: cxx.importable = false
+
+cxx.poptions =+ "-I$out_root" "-I$src_root"
+
+{hbmia obja}{*}: cxx.poptions += -DLIBCRAILS_RANDOM_STATIC_BUILD
+{hbmis objs}{*}: cxx.poptions += -DLIBCRAILS_RANDOM_SHARED_BUILD
+
+lib{crails-random}:
+{
+  cxx.export.poptions = "-I$out_root/libcrails-random/" "-I$src_root/libcrails-random/"
+  cxx.export.libs = $intf_libs
+}
+
+liba{crails-random}: cxx.export.poptions += -DLIBCRAILS_RANDOM_STATIC
+libs{crails-random}: cxx.export.poptions += -DLIBCRAILS_RANDOM_SHARED
+
+if $version.pre_release
+  lib{crails-random}: bin.lib.version = "-$version.project_id"
+else
+  lib{crails-random}: bin.lib.version = "-$version.major.$version.minor"
+
+{hxx ixx txx}{*}:
+{
+  install         = include/
+  install.subdirs = true
+}
